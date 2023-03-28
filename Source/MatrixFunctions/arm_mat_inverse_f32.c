@@ -29,6 +29,7 @@
 #include "dsp/matrix_functions.h"
 #include "dsp/matrix_utils.h"
 
+#define PIVOT_PRECISION_LIMIT (4.0f*FLT_EPSILON)
 
 /**
   @ingroup groupMatrix
@@ -218,7 +219,7 @@ arm_status arm_mat_inverse_f32(
         
       /* Check if there is a non zero pivot element to
        * replace in the rows below */
-      if ((pivot != 0.0f) && (selectedRow != column))
+      if ((fabsf(pivot) > PIVOT_PRECISION_LIMIT) && (selectedRow != column))
       {
             
             SWAP_ROWS_F32(pSrc,column, pivotRow,selectedRow);
@@ -229,12 +230,12 @@ arm_status arm_mat_inverse_f32(
             flag = 1U;
        }
 
-
+      
       
       
 
       /* Update the status if the matrix is singular */
-      if ((flag != 1U) && (pivot == 0.0f))
+      if ((fabsf(pivot) <= PIVOT_PRECISION_LIMIT))
       {
         return ARM_MATH_SINGULAR;
       }
